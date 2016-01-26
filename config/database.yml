@@ -7,21 +7,24 @@ development:
   password: password
   host: localhost
   
-  test:
-    adapter: postgresql
-    encoding: unicode
-    database: instapic_test
-    pool: 5
-    username: postgres
-    password: password
-    host: localhost
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: instapic_test
+  pool: 5
+  username: postgres
+  password: password
+  host: localhost
     
-    production:
-      adapter: postgresql
-      encoding: unicode
-      database: instapic_production
-      pool: 5
-      username: postgres
-      password: password
-      host: localhost
+production:
+  adapter: postgresql
+  encoding: unicode
+  database: instapic_production
+  pool: 5
+  username: postgres
+  password: password
+  host: localhost
+      
+      
+      
       
