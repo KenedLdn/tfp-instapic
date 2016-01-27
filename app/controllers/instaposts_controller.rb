@@ -1,4 +1,6 @@
 class InstapostsController < ApplicationController
+  before_action :authenticate_user!, only: [:new, :create]
+
   def index
   end
 
@@ -7,7 +9,7 @@ class InstapostsController < ApplicationController
   end
 
   def create
-    @instapost = Instapost.create(instapost_params)
+    @instapost = current_user.instaposts.create(instapost_params)
     if @instapost.valid?
       redirect_to root_path
     else
