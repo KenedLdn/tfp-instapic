@@ -10,11 +10,7 @@ RSpec.describe InstapostsController, type: :controller do
 
   describe "Action: instaposts#new" do
     it "should successfully show the new form" do
-      user = User.create(
-        email:                 'fakeuser@gmail.com',
-        password:              'secretPassword',
-        password_confirmation: 'secretPassword'
-      )
+      user = FactoryGirl.create(:user)
       sign_in user
 
       get :new
@@ -29,11 +25,7 @@ RSpec.describe InstapostsController, type: :controller do
 
   describe "Action: instaposts#create" do
     it "should successfully create a message in database" do
-      user = User.create(
-        email:                 'fakeuser@gmail.com',
-        password:              'secretPassword',
-        password_confirmation: 'secretPassword'
-      )
+      user = FactoryGirl.create(:user)
       sign_in user
 
       post :create, instapost: {message: 'Hello!'}
@@ -45,11 +37,7 @@ RSpec.describe InstapostsController, type: :controller do
     end
 
     it "should properly handle request if submitted without a message" do
-      user = User.create(
-        email:                 'fakeuser@gmail.com',
-        password:              'secretPassword',
-        password_confirmation: 'secretPassword'
-      )
+      user = FactoryGirl.create(:user)
       sign_in user
 
       post :create, instapost: {message: ''}
