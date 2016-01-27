@@ -4,6 +4,11 @@ class InstapostsController < ApplicationController
   def index
   end
 
+  def show
+    @instapost = Instapost.find_by_id(params[:id])
+    render text: 'Not Found', status: :not_found if @instapost.blank?
+  end
+
   def new
     @instapost = Instapost.new
   end

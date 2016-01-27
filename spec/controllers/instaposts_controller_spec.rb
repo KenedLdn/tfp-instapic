@@ -52,4 +52,18 @@ RSpec.describe InstapostsController, type: :controller do
     end
   end
 
+  describe "Action: instaposts#show" do
+    it "should successfully show the detail page if the instapost is found" do
+      instapost = FactoryGirl.create(:instapost)
+      get :show, id: instapost.id
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should properly handle error if the instapost is not found" do
+      instapost = FactoryGirl.create(:instapost)
+      get :show, id: 'ABC'
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
 end
