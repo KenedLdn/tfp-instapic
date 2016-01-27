@@ -7,22 +7,29 @@ RSpec.describe InstapostsController, type: :controller do
       expect(response).to have_http_status(:success)
     end
   end
-  
+
   describe "Action: instaposts#new" do
     it "should successfully show the new form" do
       get :new
       expect(response).to have_http_status(:success)
     end
   end
-  
+
   describe "Action: instaposts#create" do
     it "should successfully create a message in database" do
       post :create, instapost: {message: 'Hello!'}
       expect(response).to redirect_to root_path
-      
+
       instapost = Instapost.last
       expect(instapost.message).to eq('Hello!')
     end
+
+    it "should properly handle request if submitted without a message" do
+      post :create, instapost: {message: ''}
+      expect(response).to have_http_status(:unprocessable_entity)
+
+      expect(Instapost.count).to eq 0
+    end
   end
-  
+
 end
