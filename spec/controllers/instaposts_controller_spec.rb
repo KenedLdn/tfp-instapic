@@ -66,4 +66,68 @@ RSpec.describe InstapostsController, type: :controller do
     end
   end
 
+  describe "Action: instaposts#edit" do
+    it "should successfully show the edit page if the instapost is found" do
+      user = FactoryGirl.create(:user)
+      instapost = FactoryGirl.create(:instapost)
+      sign_in user
+
+      get :edit, id: instapost.id
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should properly handle error if the instapost is not found" do
+      user = FactoryGirl.create(:user)
+      instapost = FactoryGirl.create(:instapost)
+      sign_in user
+
+      get :edit, id: 'ABC'
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "should require users to be logged in" do
+      instapost = FactoryGirl.create(:instapost)
+      get :edit, id: instapost.id
+      expect(response).to redirect_to new_user_session_path
+    end
+  end
+
+  describe "Action: instaposts#update" do
+    it "should successfully update the database if the instapost is found" do
+      user = FactoryGirl.create(:user)
+      sign_in user
+
+      p = FactoryGirl.create(:instapost, message: 'Initial message')
+      patch :update, id: p.id, instapost: {message: 'Changed'}
+      expect(response).to redirect_to root_path
+      p.reload
+      expect(p.message).to eq('Changed')
+    end
+
+    it "should properly handle error if the instapost is not found" do
+      user = FactoryGirl.create(:user)
+      sign_in user
+
+      instapost = FactoryGirl.create(:instapost)
+      patch :update, id: 'ABC', instapost: {message: 'Changed'}
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "should properly handle error if updated without a message" do
+      user = FactoryGirl.create(:user)
+      sign_in user
+
+      p = FactoryGirl.create(:instapost, message: 'Initial message')
+      patch :update, id: p.id, instapost: {message: ''}
+      expect(response).to have_http_status(:unprocessable_entity)
+      p.reload
+      expect(p.message).to eq('Initial message')
+    end
+
+    it "should require users to be logged in" do
+      instapost = FactoryGirl.create(:instapost)
+      patch :update, id: instapost.id, instapost: {message: 'Changed'}
+      expect(response).to redirect_to new_user_session_path
+    end
+  end
 end

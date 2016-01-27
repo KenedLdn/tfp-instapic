@@ -1,16 +1,32 @@
 class InstapostsController < ApplicationController
-  before_action :authenticate_user!, only: [:new, :create]
+  before_action :authenticate_user!, only: [:new, :create, :edit, :update]
 
   def index
   end
 
   def show
     @instapost = Instapost.find_by_id(params[:id])
-    render text: 'Not Found', status: :not_found if @instapost.blank?
+    return render_not_found if @instapost.blank?
   end
 
   def new
     @instapost = Instapost.new
+  end
+
+  def update
+    @instapost = Instapost.find_by_id(params[:id])
+    return render_not_found if @instapost.blank?
+    @instapost.update_attributes(instapost_params)
+    if @instapost.valid?
+      redirect_to root_path
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  def edit
+    @instapost = Instapost.find_by_id(params[:id])
+    return render_not_found if @instapost.blank?
   end
 
   def create
@@ -26,5 +42,9 @@ class InstapostsController < ApplicationController
 
   def instapost_params
     params.require(:instapost).permit(:message)
+  end
+
+  def render_not_found
+    render text: 'Not Found', status: :not_found
   end
 end
