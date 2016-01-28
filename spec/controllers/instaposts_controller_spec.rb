@@ -67,20 +67,24 @@ RSpec.describe InstapostsController, type: :controller do
   end
 
   describe "Action: instaposts#edit" do
-    it "should successfully show the edit page if the instapost is found" do
-      user = FactoryGirl.create(:user)
+    it "shouldn't let a user who did not create the instapost edit a instapost" do
       instapost = FactoryGirl.create(:instapost)
+      user = FactoryGirl.create(:user)
       sign_in user
+      get :edit, id: instapost.id
+      expect(response).to have_http_status(:forbidden)
+    end
 
+    it "should successfully show the edit page if the instapost is found" do
+      instapost = FactoryGirl.create(:instapost)
+      sign_in instapost.user
       get :edit, id: instapost.id
       expect(response).to have_http_status(:success)
     end
 
     it "should properly handle error if the instapost is not found" do
-      user = FactoryGirl.create(:user)
       instapost = FactoryGirl.create(:instapost)
-      sign_in user
-
+      sign_in instapost.user
       get :edit, id: 'ABC'
       expect(response).to have_http_status(:not_found)
     end
@@ -93,11 +97,19 @@ RSpec.describe InstapostsController, type: :controller do
   end
 
   describe "Action: instaposts#update" do
-    it "should successfully update the database if the instapost is found" do
+    it "shouldn't let a user who did not create the instapost update a instapost" do
+      instapost = FactoryGirl.create(:instapost)
       user = FactoryGirl.create(:user)
       sign_in user
+      patch :update, id: instapost.id, instapost: {message: 'Changed'}
+      expect(response).to have_http_status(:forbidden)
+      instapost.reload
+      expect(instapost.message).to eq('Hello!')
+    end
 
+      it "should successfully update the database if the instapost is found" do
       p = FactoryGirl.create(:instapost, message: 'Initial message')
+      sign_in p.user
       patch :update, id: p.id, instapost: {message: 'Changed'}
       expect(response).to redirect_to root_path
       p.reload
@@ -107,16 +119,13 @@ RSpec.describe InstapostsController, type: :controller do
     it "should properly handle error if the instapost is not found" do
       user = FactoryGirl.create(:user)
       sign_in user
-
       patch :update, id: 'ABC', instapost: {message: 'Changed'}
       expect(response).to have_http_status(:not_found)
     end
 
     it "should properly handle error if updated without a message" do
-      user = FactoryGirl.create(:user)
-      sign_in user
-
       p = FactoryGirl.create(:instapost, message: 'Initial message')
+      sign_in p.user
       patch :update, id: p.id, instapost: {message: ''}
       expect(response).to have_http_status(:unprocessable_entity)
       p.reload
@@ -131,10 +140,18 @@ RSpec.describe InstapostsController, type: :controller do
   end
 
   describe "Action: instaposts#destroy" do
-    it "should allow user to destroy a post" do
+    it "shouldn't let a user who did not create the instapost update a instapost" do
+      instapost = FactoryGirl.create(:instapost)
       user = FactoryGirl.create(:user)
       sign_in user
+      delete :destroy, id: instapost.id
+      expect(response).to have_http_status(:forbidden)
+      expect(Instapost.find_by_id(instapost.id).blank?).to eq(false)
+    end
+
+    it "should allow user to destroy a post" do
       instapost = FactoryGirl.create(:instapost)
+      sign_in instapost.user
       delete :destroy, id: instapost.id
       expect(response).to redirect_to root_path
       expect(Instapost.find_by_id(instapost.id)).to eq(nil)

@@ -16,6 +16,7 @@ class InstapostsController < ApplicationController
   def update
     @instapost = Instapost.find_by_id(params[:id])
     return render_not_found if @instapost.blank?
+    return render_not_found(:forbidden) if current_user != @instapost.user
     @instapost.update_attributes(instapost_params)
     if @instapost.valid?
       redirect_to root_path
@@ -27,6 +28,7 @@ class InstapostsController < ApplicationController
   def destroy
     @instapost = Instapost.find_by_id(params[:id])
     return render_not_found if @instapost.blank?
+    return render_not_found(:forbidden) if current_user != @instapost.user
     @instapost.destroy
     redirect_to root_path
   end
@@ -34,6 +36,7 @@ class InstapostsController < ApplicationController
   def edit
     @instapost = Instapost.find_by_id(params[:id])
     return render_not_found if @instapost.blank?
+    return render_not_found(:forbidden) if current_user != @instapost.user
   end
 
   def create
@@ -51,7 +54,8 @@ class InstapostsController < ApplicationController
     params.require(:instapost).permit(:message)
   end
 
-  def render_not_found
-    render text: 'Not Found', status: :not_found
+  def render_not_found(status=:not_found)
+    render text: "#{status.to_s.titleize}", status: status
   end
+
 end
