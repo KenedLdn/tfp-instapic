@@ -1,5 +1,5 @@
 class InstapostsController < ApplicationController
-  before_action :authenticate_user!, only: [:new, :create, :edit, :update]
+  before_action :authenticate_user!, only: [:new, :create, :edit, :update, :destroy]
 
   def index
   end
@@ -22,6 +22,13 @@ class InstapostsController < ApplicationController
     else
       render :edit, status: :unprocessable_entity
     end
+  end
+
+  def destroy
+    @instapost = Instapost.find_by_id(params[:id])
+    return render_not_found if @instapost.blank?
+    @instapost.destroy
+    redirect_to root_path
   end
 
   def edit

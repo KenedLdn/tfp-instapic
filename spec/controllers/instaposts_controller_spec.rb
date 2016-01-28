@@ -108,7 +108,6 @@ RSpec.describe InstapostsController, type: :controller do
       user = FactoryGirl.create(:user)
       sign_in user
 
-      instapost = FactoryGirl.create(:instapost)
       patch :update, id: 'ABC', instapost: {message: 'Changed'}
       expect(response).to have_http_status(:not_found)
     end
@@ -130,4 +129,31 @@ RSpec.describe InstapostsController, type: :controller do
       expect(response).to redirect_to new_user_session_path
     end
   end
+
+  describe "Action: instaposts#destroy" do
+    it "should allow user to destroy a post" do
+      user = FactoryGirl.create(:user)
+      sign_in user
+      instapost = FactoryGirl.create(:instapost)
+      delete :destroy, id: instapost.id
+      expect(response).to redirect_to root_path
+      expect(Instapost.find_by_id(instapost.id)).to eq(nil)
+    end
+
+    it "should return a 404 message if we cannot find a instapost with the id that is specified" do
+      user = FactoryGirl.create(:user)
+      sign_in user
+      delete :destroy, id: 'ABC'
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "should require users to be logged in" do
+      instapost = FactoryGirl.create(:instapost)
+      delete :destroy, id: instapost.id
+      expect(response).to redirect_to new_user_session_path
+      expect(Instapost.find_by_id(instapost.id).blank?).to eq(false)
+    end
+
+  end
+
 end
